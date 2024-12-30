@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'accounts',
     'shop',
     'debug_toolbar',
+    'rest_framework',
+    
 
 ]
 
