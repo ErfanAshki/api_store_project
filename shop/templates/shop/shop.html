@@ -1,0 +1,23 @@
+<html>
+
+<head>
+</head>
+
+<body>
+
+    {% for order in orders %}
+    order_id : {{order.id}} <br>
+    order_status : {{order.status}} <br>
+        {% for item in order.items.all %}
+            order_item_id : {{item.id}} <br>
+            order_item_quantity : {{item.quantity}} <br>
+            order_item_product_id : {{item.product.id}} <br>
+            order_item_product_name : {{item.product.name}} <br>
+        {% endfor %}
+    {% comment %} order_customer : {{order.customer.id}} <br>
+    order_customer_first_name : {{order.customer.first_name}} <br> {% endcomment %}
+     ------------------------------------------------- <br>
+ {% endfor %}
+
+</body>
+</html>
