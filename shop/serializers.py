@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
+from django.utils.text import slugify
 from decimal import Decimal
 
 from .models import Product, Category
@@ -20,7 +21,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id','name','body','category','price','slug','inventory','datetime_created','rial_price','price_with_tax']
+        fields = ['id','name','body', 'category', 'price', 'inventory', 'datetime_created', 'rial_price', 'price_with_tax']
     
     body = serializers.CharField(max_length=1000, source='description')
     # category = serializers.HyperlinkedRelatedField(
@@ -42,4 +43,9 @@ class ProductSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Too short name')
         return data
 
+    def create(self, validated_data):
+        product = Product(**validated_data)
+        product.slug = slugify(product.name)
+        product.save()
+        return product
     
