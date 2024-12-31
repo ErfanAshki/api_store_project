@@ -2,6 +2,8 @@ from rest_framework import serializers
 from django.utils import timezone
 from decimal import Decimal
 
+from .models import Product, Category
+
 
 DOLLAR_TO_RIAL = 800000
 
@@ -9,6 +11,7 @@ class ProductSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField(max_length=150)
     body = serializers.CharField(max_length=1000, source='description')
+    category = serializers.PrimaryKeyRelatedField(queryset = Category.objects.all())
     price = serializers.DecimalField(max_digits=6, decimal_places=2, source='unit_price')
     slug = serializers.SlugField()
     inventory = serializers.IntegerField()
