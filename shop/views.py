@@ -7,11 +7,20 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-@api_view()
+@api_view(['GET', 'POST'])
 def product_list(request):
-    products = Product.objects.select_related('category').all()
-    serializer = ProductSerializer(products, many=True, context={'request': request})
-    return Response(serializer.data)
+    if request.method == 'GET':
+        products = Product.objects.select_related('category').all()
+        serializer = ProductSerializer(products, many=True, context={'request': request})
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        serializer = ProductSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.validated_data
+            return Response('ok')
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view()
