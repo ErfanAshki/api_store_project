@@ -23,10 +23,10 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ['id','name','body','category','price','slug','inventory','datetime_created','rial_price','price_with_tax']
     
     body = serializers.CharField(max_length=1000, source='description')
-    category = serializers.HyperlinkedRelatedField(
-        queryset=Category.objects.all() ,
-        view_name='category_detail'
-    ) 
+    # category = serializers.HyperlinkedRelatedField(
+    #     queryset=Category.objects.all() ,
+    #     view_name='category_detail'
+    # ) 
     price = serializers.DecimalField(max_digits=6, decimal_places=2, source='unit_price')
     rial_price = serializers.SerializerMethodField()
     price_with_tax = serializers.SerializerMethodField(method_name='calc_tat')
@@ -37,6 +37,9 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_rial_price(self, product):
         return int(product.unit_price * DOLLAR_TO_RIAL)
     
-
+    def validate(self, data):
+        if len(data['name']) < 5 :
+            raise serializers.ValidationError('Too short name')
+        return data
 
     
