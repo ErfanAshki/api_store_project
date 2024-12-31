@@ -18,7 +18,10 @@ class ProductSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField(max_length=150)
     body = serializers.CharField(max_length=1000, source='description')
-    category = CategorySerializer()
+    category = serializers.HyperlinkedRelatedField(
+        queryset=Category.objects.all() ,
+        view_name='category_detail'
+    ) 
     price = serializers.DecimalField(max_digits=6, decimal_places=2, source='unit_price')
     slug = serializers.SlugField()
     inventory = serializers.IntegerField()
