@@ -43,7 +43,11 @@ class CategoryViewSet(ModelViewSet):
 
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
-    queryset = Comment.objects.select_related('product').all()
+    
+    def get_queryset(self):
+        product_pk = self.kwargs['product_pk']
+        return Comment.objects.select_related('product').filter( \
+            product_id=product_pk).all()
 
 
 
