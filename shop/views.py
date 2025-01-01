@@ -21,7 +21,7 @@ def product_list(request):
         return Response(serializer.data)
 
 
-@api_view(['Get', 'PUT', 'PATCH'])
+@api_view(['Get', 'PUT', 'PATCH', 'DELETE'])
 def product_detail(request, pk):
     product = get_object_or_404(Product.objects.select_related('category'), pk=pk)
     
