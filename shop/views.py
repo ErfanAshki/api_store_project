@@ -13,7 +13,15 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
-    queryset = Product.objects.select_related('category').all()
+    
+    def get_queryset(self):
+        category_id_params = self.request.query_params.get('category_id')
+        queryset = Product.objects.select_related('category').all()
+        
+        if category_id_params is not None:
+            queryset = queryset.filter(category_id=category_id_params)
+
+        return queryset
 
     def get_serializer_context(self):
         return {'request': self.request}
