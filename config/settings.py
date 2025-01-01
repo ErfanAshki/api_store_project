@@ -45,8 +45,8 @@ INSTALLED_APPS = [
     # my_apps
     'accounts',
     'shop',
-    'rest_framework',
     'debug_toolbar',
+    'rest_framework',
     
 
 ]
