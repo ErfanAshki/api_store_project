@@ -49,9 +49,9 @@ class ProductSerializer(serializers.ModelSerializer):
         product.save()
         return product
     
-    def update(self, validated_data, instance):
-        instance.inventory = validated_data.get('inventory')
-        instance.save()
-        return instance
+    # def update(self, validated_data, instance):
+    #     instance.inventory = validated_data.get('inventory')
+    #     instance.save()
+    #     return instance
     
     
