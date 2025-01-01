@@ -52,36 +52,36 @@ def product_detail(request, pk):
 @api_view(['GET', 'POST'])
 def category_list(request): 
     if request.method == 'GET':
-        category = Category.objects.all()
+        category = Category.objects.prefetch_related('products').all()
         serializer = CategorySerializer(category, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == 'POST':
         serializer = CategorySerializer(data=request.data)
         serializer.is_valid(raise_exception = True)
         serializer.save()
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['Get', 'PUT', 'PATCH', 'DELETE'])
 def category_detail(request, pk):
-    category = get_object_or_404(Category, pk=pk)
+    category = get_object_or_404(Category.objects.prefetch_related('products'), pk=pk)
     
     if request.method == 'GET':
         serializer = CategorySerializer(category)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     elif request.method == 'PUT':
         serializer = CategorySerializer(category, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     elif request.method == 'PATCH':
         serializer = CategorySerializer(category, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     elif request.method == 'DELETE':
         if category.products.count() > 0 : 
