@@ -38,10 +38,11 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_rial_price(self, product):
         return int(product.unit_price * DOLLAR_TO_RIAL)
     
-    def validate(self, data):
-        if len(data['name']) < 5 :
-            raise serializers.ValidationError('Too short name')
-        return data
+    # def validate(self, data):
+    #     if data['name']:
+    #         if len(data['name']) < 5 :
+    #             raise serializers.ValidationError('Too short name')
+    #     return data
 
     def create(self, validated_data):
         product = Product(**validated_data)

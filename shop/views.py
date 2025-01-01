@@ -21,7 +21,7 @@ def product_list(request):
         return Response(serializer.data)
 
 
-@api_view(['Get', 'PUT'])
+@api_view(['Get', 'PUT', 'PATCH'])
 def product_detail(request, pk):
     product = get_object_or_404(Product.objects.select_related('category'), pk=pk)
     
@@ -31,6 +31,12 @@ def product_detail(request, pk):
     
     elif request.method == 'PUT':
         serializer = ProductSerializer(product, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    
+    elif request.method == 'PATCH':
+        serializer = ProductSerializer(product, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
