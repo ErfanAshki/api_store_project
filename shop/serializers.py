@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from decimal import Decimal
 
-from .models import Product, Category
+from .models import Product, Category, Comment, Order, OrderItem
 
 
 DOLLAR_TO_RIAL = 800000
@@ -16,6 +16,7 @@ class CategorySerializer(serializers.ModelSerializer):
         
     name = serializers.CharField(max_length=150, source='title')
     number_of_products = serializers.SerializerMethodField()
+
     
     def get_number_of_products(self, category):
         return category.products.count()
@@ -65,5 +66,20 @@ class ProductSerializer(serializers.ModelSerializer):
     #     instance.inventory = validated_data.get('inventory')
     #     instance.save()
     #     return instance
+    
+    
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'text', 'name', 'product', 'status', 'datetime_created']
+        
+    text = serializers.CharField(max_length=500, source='body')
+    
+    def validate(self, data):
+        body = data.get('body')
+        if body:
+            if len(data['body']) < 4 :
+                raise serializers.ValidationError('Too short comment')
+        return data  
     
     

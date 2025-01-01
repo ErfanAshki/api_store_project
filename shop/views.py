@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Product, Discount, Category, Comment, Customer, Address, Cart, CartItem, Order, OrderItem
-from .serializers import ProductSerializer, CategorySerializer
+from .serializers import ProductSerializer, CategorySerializer, CommentSerializer
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -40,6 +40,11 @@ class CategoryViewSet(ModelViewSet):
         category.delete()
         return Response('Object was deleted.', status=status.HTTP_204_NO_CONTENT)
     
+
+class CommentViewSet(ModelViewSet):
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.select_related('product').all()
+
 
 
 # class ProductList(ListCreateAPIView):
