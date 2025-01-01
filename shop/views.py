@@ -49,6 +49,9 @@ class CommentViewSet(ModelViewSet):
         return Comment.objects.select_related('product').filter( \
             product_id=product_pk).all()
 
+    def get_serializer_context(self):
+        return {'product_pk' : self.kwargs['product_pk']}
+
 
 
 # class ProductList(ListCreateAPIView):

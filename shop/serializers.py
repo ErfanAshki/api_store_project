@@ -71,7 +71,7 @@ class ProductSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['id', 'text', 'name', 'product', 'status', 'datetime_created']
+        fields = ['id', 'text', 'name', 'status', 'datetime_created']
         
     text = serializers.CharField(max_length=500, source='body')
     
@@ -82,4 +82,15 @@ class CommentSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError('Too short comment')
         return data  
     
+    def create(self, validated_data):
+        comment = Comment(**validated_data)
+        comment.product_id = self.context['product_pk']
+        comment.save()
+        return comment
     
+    # way two
+    # def create(self, validated_data):
+    #     product_pk = self.context['product_pk']
+    #     return Comment.objects.create(product_id=product_pk, **validated_data)
+        
+        
