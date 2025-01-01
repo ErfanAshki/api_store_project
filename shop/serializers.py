@@ -12,11 +12,21 @@ DOLLAR_TO_RIAL = 800000
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name', 'description']
+        fields = ['id', 'name', 'description', 'number_of_products']
         
     name = serializers.CharField(max_length=150, source='title')
-
-
+    number_of_products = serializers.SerializerMethodField()
+    
+    def get_number_of_products(self, category):
+        return category.products.count()
+    
+    def validate(self, data):
+        title = data.get('title')
+        if title:
+            if len(data['title']) < 3:
+                raise serializers.ValidationError('Too short title')
+        return data
+    
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
