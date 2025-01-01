@@ -6,19 +6,31 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.mixins import CreateModelMixin, ListModelMixin
+from rest_framework.generics import ListAPIView, ListCreateAPIView
 
 
-class ProductList(APIView):
-    def get(self, request):
-        products = Product.objects.select_related('category').all()
-        serializer = ProductSerializer(products, many=True, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+class ProductList(ListCreateAPIView):
+    serializer_class = ProductSerializer
+    queryset = Product.objects.select_related('category').all()
+
+    def get_serializer_context(self):
+        return {'request': self.request}
+        
     
-    def post(self, request):
-        serializer = ProductSerializer(data=request.data)
-        serializer.is_valid(raise_exception = True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+# class ProductList(APIView):
+#     def get(self, request):
+#         products = Product.objects.select_related('category').all()
+#         serializer = ProductSerializer(products, many=True, context={'request': request})
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+#     def post(self, request):
+#         serializer = ProductSerializer(data=request.data)
+#         serializer.is_valid(raise_exception = True)
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
 
 class ProductDetail(APIView):
@@ -51,6 +63,11 @@ class ProductDetail(APIView):
     
         
         
+class CategoryList(ListCreateAPIView):
+    serializer_class = CategorySerializer
+    queryset = Category.objects.prefetch_related('products').all()
+    
+
     
 # @api_view(['Get', 'PUT', 'PATCH', 'DELETE'])
 # def product_detail(request, pk):
@@ -95,20 +112,21 @@ class ProductDetail(APIView):
 #         return Response(serializer.data)
 
 
+    
 
 
-@api_view(['GET', 'POST'])
-def category_list(request): 
-    if request.method == 'GET':
-        category = Category.objects.prefetch_related('products').all()
-        serializer = CategorySerializer(category, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+# @api_view(['GET', 'POST'])
+# def category_list(request): 
+#     if request.method == 'GET':
+#         category = Category.objects.prefetch_related('products').all()
+#         serializer = CategorySerializer(category, many=True)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    elif request.method == 'POST':
-        serializer = CategorySerializer(data=request.data)
-        serializer.is_valid(raise_exception = True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+#     elif request.method == 'POST':
+#         serializer = CategorySerializer(data=request.data)
+#         serializer.is_valid(raise_exception = True)
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['Get', 'PUT', 'PATCH', 'DELETE'])
