@@ -4,6 +4,7 @@ from django.db.models import Count
 from .models import Product, Discount, Category, Comment, Customer, Address, Cart, CartItem, Order, OrderItem
 from .serializers import ProductSerializer, CategorySerializer, CommentSerializer
 from .filters import ProductFilter
+from .paginations import DefaultPagination
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -15,6 +16,7 @@ from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveMode
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 
 
 class ProductViewSet(ModelViewSet):
@@ -25,6 +27,7 @@ class ProductViewSet(ModelViewSet):
     ordering_fields = ['id', 'inventory', 'unit_price']
     # filterset_fields = ['category']
     filterset_class = ProductFilter
+    # pagination_class = DefaultPagination
 
     def get_serializer_context(self):
         return {'request': self.request}
