@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Product, Discount, Category, Comment, Customer, Address, Cart, CartItem, Order, OrderItem
 from .serializers import ProductSerializer, CategorySerializer, CommentSerializer
-
+from .filters import ProductFilter
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -18,8 +18,8 @@ class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
     queryset = Product.objects.select_related('category').all()
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['category', 'inventory']
-  
+    # filterset_fields = ['category']
+    filterset_class = ProductFilter
 
     def get_serializer_context(self):
         return {'request': self.request}
