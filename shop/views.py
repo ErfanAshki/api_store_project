@@ -12,12 +12,14 @@ from rest_framework.views import APIView
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.filters import OrderingFilter, SearchFilter
 
 
 class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
     queryset = Product.objects.select_related('category').all()
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    ordering_fields = ['id', 'inventory', 'unit_price']
     # filterset_fields = ['category']
     filterset_class = ProductFilter
 
@@ -37,6 +39,9 @@ class ProductViewSet(ModelViewSet):
 class CategoryViewSet(ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.prefetch_related('products').all()
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    ordering_fields = ['id']
+    filterset_fields = ['title']
 
     def destroy(self, request, pk):
         category = get_object_or_404(Category.objects.prefetch_related('products'), pk=pk)
