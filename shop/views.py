@@ -1,4 +1,6 @@
 from django.shortcuts import render, get_object_or_404
+from django.db.models import Count
+
 from .models import Product, Discount, Category, Comment, Customer, Address, Cart, CartItem, Order, OrderItem
 from .serializers import ProductSerializer, CategorySerializer, CommentSerializer
 from .filters import ProductFilter
@@ -18,7 +20,8 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
     queryset = Product.objects.select_related('category').all()
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    search_fields = ['name', 'category__title']
     ordering_fields = ['id', 'inventory', 'unit_price']
     # filterset_fields = ['category']
     filterset_class = ProductFilter
@@ -38,10 +41,14 @@ class ProductViewSet(ModelViewSet):
 
 class CategoryViewSet(ModelViewSet):
     serializer_class = CategorySerializer
-    queryset = Category.objects.prefetch_related('products').all()
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    ordering_fields = ['id']
-    filterset_fields = ['title']
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    search_fields = ['title']
+    ordering_fields = ['id', 'number_of_products']
+    # filterset_fields = ['title']
+    
+    def get_queryset(self):
+        return Category.objects.prefetch_related('products').annotate(\
+           number_of_products=Count('products')).all()
 
     def destroy(self, request, pk):
         category = get_object_or_404(Category.objects.prefetch_related('products'), pk=pk)
