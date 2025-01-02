@@ -90,7 +90,7 @@ admin.site.register(Product, ProductAdmin)
 
 
 class ItemsFilter(admin.SimpleListFilter):
-    title = 'Items Of Orders'
+    title = 'Items Of Orders or carts'
     parameter_name = 'items'
     LESS_THAN_3 = '<3'
     BETWEEN_3_AND_7 = '3<=7'
@@ -221,4 +221,32 @@ class CommentAdmin(admin.ModelAdmin):
     
     
 admin.site.register(Comment, CommentAdmin)
+
+
+class CartItemInline(admin.StackedInline):
+    model = CartItem
+    fields = ['id', 'cart', 'product' , 'quantity']
+    extra = 1
+    min_num = 1
+    max_num = 20
+
+
+class CartAdmin(admin.ModelAdmin):
+    list_display = ['id', 'created_at', 'number_of_items']
+    ordering = ['id']
+    list_per_page = 10
+    list_filter = [ItemsFilter]
+    inlines = [CartItemInline]
+    
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('items'). \
+            annotate(items_count=Count('items'))
+    
+    @admin.display(ordering='items_count')
+    def number_of_items(self, order):
+        return order.items_count
+    
+    
+admin.site.register(Cart, CartAdmin)
 

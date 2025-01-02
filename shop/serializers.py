@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from decimal import Decimal
 
-from .models import Product, Category, Comment, Order, OrderItem
+from .models import Product, Category, Comment, Order, OrderItem, Cart, CartItem
 
 
 DOLLAR_TO_RIAL = 800000
@@ -94,3 +94,13 @@ class CommentSerializer(serializers.ModelSerializer):
     #     return Comment.objects.create(product_id=product_pk, **validated_data)
         
         
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = ['id' ,'number_of_items']
+        read_only_fields = ['id']
+        
+    number_of_items = serializers.SerializerMethodField()
+    
+    def get_number_of_items(self, cart):
+        return cart.items.count()

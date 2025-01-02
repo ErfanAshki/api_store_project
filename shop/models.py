@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
+from uuid import uuid4
 
 
 class Category(models.Model):
@@ -103,6 +104,7 @@ class OrderItem(models.Model):
         
         
 class Cart(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4)
     created_at = models.DateTimeField(default=timezone.now, verbose_name=_('created_at'))
 
 

@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Count
 
 from .models import Product, Discount, Category, Comment, Customer, Address, Cart, CartItem, Order, OrderItem
-from .serializers import ProductSerializer, CategorySerializer, CommentSerializer
+from .serializers import ProductSerializer, CategorySerializer, CommentSerializer, CartSerializer
 from .filters import ProductFilter
 from .paginations import DefaultPagination
 
@@ -73,6 +73,10 @@ class CommentViewSet(ModelViewSet):
     def get_serializer_context(self):
         return {'product_pk' : self.kwargs['product_pk']}
 
+
+class CartViewSet(ModelViewSet):
+    serializer_class = CartSerializer
+    queryset = Cart.objects.prefetch_related('items').all()
 
 
 # class ProductList(ListCreateAPIView):
