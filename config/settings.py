@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'shop',
     'debug_toolbar',
     'rest_framework',
+    'django_filters',
     
 
 ]

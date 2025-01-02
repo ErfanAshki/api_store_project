@@ -2,6 +2,9 @@ from django.shortcuts import render, get_object_or_404
 from .models import Product, Discount, Category, Comment, Customer, Address, Cart, CartItem, Order, OrderItem
 from .serializers import ProductSerializer, CategorySerializer, CommentSerializer
 
+
+from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -13,15 +16,10 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
-    
-    def get_queryset(self):
-        category_id_params = self.request.query_params.get('category_id')
-        queryset = Product.objects.select_related('category').all()
-        
-        if category_id_params is not None:
-            queryset = queryset.filter(category_id=category_id_params)
-
-        return queryset
+    queryset = Product.objects.select_related('category').all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['category', 'inventory']
+  
 
     def get_serializer_context(self):
         return {'request': self.request}
