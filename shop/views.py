@@ -76,6 +76,8 @@ class CommentViewSet(ModelViewSet):
 
 
 class CartViewSet(ModelViewSet):
+    lookup_value_regex = '[0-9a-f]{32}' #without hyphen
+    # lookup_value_regex = '[0-9a-fA-F]{8}\-?[0-9a-fA-F]{4}\-?[0-9a-fA-F]{4}\-?[0-9a-fA-F]{4}\-?[0-9a-fA-F]{12}' #with hyphen
     serializer_class = CartSerializer
     queryset = Cart.objects.prefetch_related('items__product').all()
 
