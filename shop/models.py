@@ -38,13 +38,13 @@ class Product(models.Model):
     
 
 class Customer(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True)
     phone_number = models.CharField(max_length=250, verbose_name=_('phone_number'))
     birth_date = models.DateField(verbose_name=_('birthdate'), null=True, blank=True)
     email = models.EmailField(verbose_name=_('email'), blank=True, null=True)
     
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.user.first_name} {self.user.last_name}"
     
     
 class Address(models.Model):

@@ -151,7 +151,7 @@ class CartSerializer(serializers.ModelSerializer):
         
     number_of_items = serializers.SerializerMethodField()
     total_price = serializers.SerializerMethodField()
-    items = CartItemSerializer(many=True)
+    items = CartItemSerializer(many=True, read_only=True)
     
     def get_number_of_items(self, cart):
         return cart.items.count()
