@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
+from django.conf import settings
 from uuid import uuid4
 
 
@@ -37,8 +38,7 @@ class Product(models.Model):
     
 
 class Customer(models.Model):
-    first_name = models.CharField(max_length=100, verbose_name=_('first_name'))    
-    last_name = models.CharField(max_length=100, verbose_name=_('last_name'))
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     phone_number = models.CharField(max_length=250, verbose_name=_('phone_number'))
     birth_date = models.DateField(verbose_name=_('birthdate'), null=True, blank=True)
     email = models.EmailField(verbose_name=_('email'), blank=True, null=True)

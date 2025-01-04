@@ -198,8 +198,8 @@ class CustomerAdmin(admin.ModelAdmin):
     list_per_page = 20    
     list_editable = ['birth_date', 'email']
     list_filter = ['orders']
-    search_fields = ['first_name__istartswith', 'last_name__istartswith']
-    list_display_links = ['id', 'first_name']
+    search_fields = ['user__first_name__istartswith', 'user__last_name__istartswith']
+    list_display_links = ['id', 'user__first_name']
     
     
 admin.site.register(Customer, CustomerAdmin)
