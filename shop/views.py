@@ -76,7 +76,7 @@ class CommentViewSet(ModelViewSet):
 
 class CartViewSet(ModelViewSet):
     serializer_class = CartSerializer
-    queryset = Cart.objects.prefetch_related('items').all()
+    queryset = Cart.objects.prefetch_related('items__product').all()
 
 
 # class ProductList(ListCreateAPIView):
