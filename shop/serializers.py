@@ -124,15 +124,16 @@ class CartItemAddSerializer(serializers.ModelSerializer):
         product = validated_data.get('product')
         quantity = validated_data.get('quantity')
 
-        if CartItem.objects.filter(cart_id=cart_pk, product_id=product.id).exists():
+        try:
             cart_item = CartItem.objects.get(cart_id=cart_pk, product_id=product.id)
             cart_item.quantity += quantity
             cart_item.save()
-        else:
+        except CartItem.DoesNotExist:
             cart_item = CartItem(**validated_data)
             cart_item.cart_id = self.context['cart_pk']
             cart_item.save()
-            
+        
+        self.instance = cart_item
         return cart_item
         
         
