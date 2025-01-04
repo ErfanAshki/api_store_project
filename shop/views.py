@@ -3,7 +3,7 @@ from django.db.models import Count
 
 from .models import Product, Discount, Category, Comment, Customer, Address, Cart, CartItem, Order, OrderItem
 from .serializers import ProductSerializer, CategorySerializer, CommentSerializer, CartSerializer, CartItemSerializer, \
-    CartItemProductSerializer, CartItemAddSerializer
+    CartItemProductSerializer, CartItemAddSerializer, CartItemUpdateSerializer
 from .filters import ProductFilter
 from .paginations import DefaultPagination
 
@@ -81,6 +81,7 @@ class CartViewSet(ModelViewSet):
 
 
 class CartItemViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     
     def get_queryset(self):
         cart_pk = self.kwargs.get('cart_pk')
@@ -89,6 +90,8 @@ class CartItemViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return CartItemAddSerializer
+        elif self.request.method == 'PATCH':
+            return CartItemUpdateSerializer
         return CartItemSerializer
 
     def get_serializer_context(self):
