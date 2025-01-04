@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from decimal import Decimal
 
-from .models import Product, Category, Comment, Order, OrderItem
+from .models import Product, Category, Comment, Order, OrderItem, Cart, CartItem
 
 
 DOLLAR_TO_RIAL = 800000
@@ -92,5 +92,69 @@ class CommentSerializer(serializers.ModelSerializer):
     # def create(self, validated_data):
     #     product_pk = self.context['product_pk']
     #     return Comment.objects.create(product_id=product_pk, **validated_data)
+    
+
+class CartItemProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'unit_price']
+    
+
+class CartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'quantity', 'item_price']
+        read_only_fields = ['cart']
         
+    product = CartItemProductSerializer()
+    item_price = serializers.SerializerMethodField()
+    
+    def get_item_price(self, cart_item):
+        return cart_item.quantity * cart_item.product.unit_price
         
+
+class CartItemAddSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = ['id','product', 'quantity']
+
+    def create(self, validated_data):
+        
+        cart_pk = self.context['cart_pk']
+        product = validated_data.get('product')
+        quantity = validated_data.get('quantity')
+
+        try:
+            cart_item = CartItem.objects.get(cart_id=cart_pk, product_id=product.id)
+            cart_item.quantity += quantity
+            cart_item.save()
+        except CartItem.DoesNotExist:
+            cart_item = CartItem(**validated_data)
+            cart_item.cart_id = self.context['cart_pk']
+            cart_item.save()
+        
+        self.instance = cart_item
+        return cart_item
+        
+
+class CartItemUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = ['quantity']
+
+        
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = ['id' ,'number_of_items', 'total_price', 'items']
+        read_only_fields = ['id', 'items']
+        
+    number_of_items = serializers.SerializerMethodField()
+    total_price = serializers.SerializerMethodField()
+    items = CartItemSerializer(many=True)
+    
+    def get_number_of_items(self, cart):
+        return cart.items.count()
+    
+    def get_total_price(self, cart):
+        return sum(item.quantity * item.product.unit_price for item in cart.items.all())

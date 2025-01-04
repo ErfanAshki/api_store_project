@@ -2,7 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Count
 
 from .models import Product, Discount, Category, Comment, Customer, Address, Cart, CartItem, Order, OrderItem
-from .serializers import ProductSerializer, CategorySerializer, CommentSerializer
+from .serializers import ProductSerializer, CategorySerializer, CommentSerializer, CartSerializer, CartItemSerializer, \
+    CartItemProductSerializer, CartItemAddSerializer, CartItemUpdateSerializer
 from .filters import ProductFilter
 from .paginations import DefaultPagination
 
@@ -72,6 +73,31 @@ class CommentViewSet(ModelViewSet):
 
     def get_serializer_context(self):
         return {'product_pk' : self.kwargs['product_pk']}
+
+
+class CartViewSet(ModelViewSet):
+    lookup_value_regex = '[0-9a-f]{32}' #without hyphen
+    # lookup_value_regex = '[0-9a-fA-F]{8}\-?[0-9a-fA-F]{4}\-?[0-9a-fA-F]{4}\-?[0-9a-fA-F]{4}\-?[0-9a-fA-F]{12}' #with hyphen
+    serializer_class = CartSerializer
+    queryset = Cart.objects.prefetch_related('items__product').all()
+
+
+class CartItemViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
+    
+    def get_queryset(self):
+        cart_pk = self.kwargs.get('cart_pk')
+        return CartItem.objects.filter(cart_id=cart_pk).select_related('product')
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CartItemAddSerializer
+        elif self.request.method == 'PATCH':
+            return CartItemUpdateSerializer
+        return CartItemSerializer
+
+    def get_serializer_context(self):
+        return {'cart_pk': self.kwargs.get('cart_pk')}
 
 
 
