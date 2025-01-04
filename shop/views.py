@@ -79,13 +79,23 @@ class CartViewSet(ModelViewSet):
     serializer_class = CartSerializer
     queryset = Cart.objects.prefetch_related('items__product').all()
 
+
 class CartItemViewSet(ModelViewSet):
-    serializer_class = CartItemSerializer
     
     def get_queryset(self):
         cart_pk = self.kwargs.get('cart_pk')
         return CartItem.objects.filter(cart_id=cart_pk).select_related('product')
     
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CartItemAddSerializer
+        # if self.request.method == 'GET':
+        return CartItemSerializer
+
+    def get_serializer_context(self):
+        return {'cart_pk': self.kwargs.get('cart_pk')}
+
+
 
 # class ProductList(ListCreateAPIView):
 #     serializer_class = ProductSerializer

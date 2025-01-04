@@ -113,6 +113,17 @@ class CartItemSerializer(serializers.ModelSerializer):
         return cart_item.quantity * cart_item.product.unit_price
         
 
+class CartItemAddSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = ['id','product', 'quantity']
+
+    def create(self, validated_data):
+        cart_item = CartItem(**validated_data)
+        cart_item.cart_id = self.context['cart_pk']
+        cart_item.save()
+        return cart_item
+        
         
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
