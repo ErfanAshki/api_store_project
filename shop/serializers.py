@@ -92,15 +92,26 @@ class CommentSerializer(serializers.ModelSerializer):
     # def create(self, validated_data):
     #     product_pk = self.context['product_pk']
     #     return Comment.objects.create(product_id=product_pk, **validated_data)
+    
+    
+
+class CartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'quantity']
+        read_only_fields = ['cart']
         
+
         
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
-        fields = ['id' ,'number_of_items']
-        read_only_fields = ['id']
+        fields = ['id' ,'number_of_items', 'items']
+        read_only_fields = ['id', 'items']
         
     number_of_items = serializers.SerializerMethodField()
+    items = CartItemSerializer(many=True)
     
     def get_number_of_items(self, cart):
         return cart.items.count()
+    
