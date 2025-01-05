@@ -47,6 +47,14 @@ class Customer(models.Model):
         return f"{self.user.first_name} {self.user.last_name}"
     
     @property
+    def first_name(self):
+        return self.user.first_name
+
+    @property
+    def last_name(self):
+        return self.user.last_name
+    
+    @property
     def full_name(self):
         return f"{self.user.first_name} {self.user.last_name}"  
     
