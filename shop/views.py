@@ -3,7 +3,7 @@ from django.db.models import Count
 
 from .models import Product, Discount, Category, Comment, Customer, Address, Cart, CartItem, Order, OrderItem
 from .serializers import ProductSerializer, CategorySerializer, CommentSerializer, CartSerializer, CartItemSerializer, \
-    CartItemProductSerializer, CartItemAddSerializer, CartItemUpdateSerializer
+    CartItemProductSerializer, CartItemAddSerializer, CartItemUpdateSerializer, CustomerSerializer
 from .filters import ProductFilter
 from .paginations import DefaultPagination
 
@@ -98,6 +98,11 @@ class CartItemViewSet(ModelViewSet):
 
     def get_serializer_context(self):
         return {'cart_pk': self.kwargs.get('cart_pk')}
+
+
+class CustomerViewSet(ModelViewSet):
+    serializer_class = CustomerSerializer
+    queryset = Customer.objects.prefetch_related('orders').all()
 
 
 
