@@ -174,6 +174,7 @@ SIMPLE_JWT = {
 # "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTczNjQyMjQ1OSwiaWF0IjoxNzM2MTYzMjU5LCJqdGkiOiJiZDcyZDRjYjdkOWE0Zjc0OTlmOGY0YTA4MzkwYmU1MyIsInVzZXJfaWQiOjl9.FCcK97paQJeA1a05yOH0_PT5b8-k3KMPcUya0-wFVDo"
 
 
+
 # djoser config
 DJOSER = {
     'SERIALIZERS': {
