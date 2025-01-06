@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from environs import Env
+from datetime import timedelta
 
 env = Env()
 env.read_env()
@@ -160,10 +161,18 @@ REST_FRAMEWORK = {
     )
 }
 
+
 # jwt config
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT', ),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=3),
 }
+
+
+#  "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM2MjQ5NjU5LCJpYXQiOjE3MzYxNjMyNTksImp0aSI6IjQzMWY4ODRlNzM3ZTQ5YjFiN2MxMzhhZDE2ODU5MDFhIiwidXNlcl9pZCI6OX0.mVCfoFajO_i5qxD6CPMW6SOMTE7MnjnD9h5UmncX9mo"
+# "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTczNjQyMjQ1OSwiaWF0IjoxNzM2MTYzMjU5LCJqdGkiOiJiZDcyZDRjYjdkOWE0Zjc0OTlmOGY0YTA4MzkwYmU1MyIsInVzZXJfaWQiOjl9.FCcK97paQJeA1a05yOH0_PT5b8-k3KMPcUya0-wFVDo"
+
 
 # djoser config
 DJOSER = {
