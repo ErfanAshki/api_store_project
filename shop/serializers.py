@@ -171,3 +171,31 @@ class CustomerSerializer(serializers.ModelSerializer):
     def get_number_of_orders(self, customer):
         return customer.orders.count()
     
+
+
+class ProductForOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name']
+
+
+    
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:    
+        model = OrderItem
+        fields = ['id', 'product', 'quantity', 'unit_price']
+        
+        product = ProductSerializer()
+    
+    
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['id', 'customer', 'status', 'number_of_items', 'items']
+        
+    number_of_items = serializers.SerializerMethodField()
+    items = OrderItemSerializer(many=True)
+
+    def get_number_of_items(self, order):
+        return order.items.count()
