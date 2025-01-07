@@ -8,3 +8,8 @@ class IsAdminOrReadOnly(permissions.BasePermission):
             return True
         return bool(request.user and request.user.is_staff)
  
+
+class SendPrivateEmailToCustomers(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.has_perm('shop.send_private_email'))
+
