@@ -6,6 +6,7 @@ from .serializers import ProductSerializer, CategorySerializer, CommentSerialize
     CartItemProductSerializer, CartItemAddSerializer, CartItemUpdateSerializer, CustomerSerializer
 from .filters import ProductFilter
 from .paginations import DefaultPagination
+from .permissions import IsAdminOrReadOnly
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -50,6 +51,7 @@ class CategoryViewSet(ModelViewSet):
     search_fields = ['title']
     ordering_fields = ['id', 'number_of_products']
     # filterset_fields = ['title']
+    permission_classes = [IsAdminOrReadOnly]
     
     def get_queryset(self):
         return Category.objects.prefetch_related('products').annotate(\
