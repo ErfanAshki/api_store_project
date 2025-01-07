@@ -9,7 +9,7 @@ from .paginations import DefaultPagination
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -103,6 +103,23 @@ class CartItemViewSet(ModelViewSet):
 class CustomerViewSet(ModelViewSet):
     serializer_class = CustomerSerializer
     queryset = Customer.objects.prefetch_related('orders').all()
+
+    @action(detail=False, methods=['GET', 'PUT'])
+    def me(self, request):
+        if request.user.is_authenticated:
+            user_id =request.user.id
+            customer = Customer.objects.get(user_id=user_id)
+
+            if request.method == 'GET':
+                serializer = CustomerSerializer(customer)
+                return Response(serializer.data)     
+            elif request.method == "PUT":
+                serializer = CustomerSerializer(customer, data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data)
+        else:
+            return Response('Please login to show your data')
 
 
 

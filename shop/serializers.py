@@ -164,6 +164,7 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model =  Customer
         fields = ['id', 'user', 'phone_number', 'birth_date', 'email', 'number_of_orders']
+        read_only_fields = ['user']
         
     number_of_orders = serializers.SerializerMethodField()
 
