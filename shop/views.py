@@ -1,9 +1,10 @@
 from django.shortcuts import render, get_object_or_404
-from django.db.models import Count
+from django.db.models import Count, Prefetch
 
 from .models import Product, Discount, Category, Comment, Customer, Address, Cart, CartItem, Order, OrderItem
 from .serializers import ProductSerializer, CategorySerializer, CommentSerializer, CartSerializer, CartItemSerializer, \
-    CartItemProductSerializer, CartItemAddSerializer, CartItemUpdateSerializer, CustomerSerializer
+    CartItemProductSerializer, CartItemAddSerializer, CartItemUpdateSerializer, CustomerSerializer, OrderSerializer, \
+    OrderItemSerializer, ProductForOrderSerializer
 from .filters import ProductFilter
 from .paginations import DefaultPagination
 from .permissions import IsAdminOrReadOnly, SendPrivateEmailToCustomers
@@ -126,6 +127,17 @@ class CustomerViewSet(ModelViewSet):
     def sending_email(self, request, pk):
         return Response(f"Sending email to customer {pk}")
 
+
+
+class OrderViewSet(ModelViewSet):
+    serializer_class = OrderSerializer
+    
+    def get_queryset(self):
+        return Order.objects.select_related('customer').prefetch_related(
+            Prefetch('items', 
+                    queryset=OrderItem.objects.select_related('product').all())
+        ).all()
+    
 
 
 # class ProductList(ListCreateAPIView):
