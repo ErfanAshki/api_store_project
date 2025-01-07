@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from environs import Env
+from datetime import timedelta
 
 env = Env()
 env.read_env()
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'rest_framework',
     'django_filters',
+    'djoser',
     
 
 ]
@@ -154,5 +156,34 @@ REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False,
     'PAGE_SIZE': 10,
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ], 
+    
 }
 
+
+# jwt config
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('JWT', ),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=3),
+}
+
+
+# {
+#     "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTczNjUxMDI1OSwiaWF0IjoxNzM2MjUxMDU5LCJqdGkiOiI0YzgzZTZmYWZhOGU0MmM4OTYzZDNjZGIxODk1NmJlNCIsInVzZXJfaWQiOjl9.TCWWQM0gOlW0E8dDoS1UpCj0-eS1hsaPWqX8wKRYVD8",
+#     "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM2MzM3NDU5LCJpYXQiOjE3MzYyNTEwNTksImp0aSI6Ijc3ODFjZTY5ZDJiNjRkYmQ4ZjAwMGJiMmEyNjA2NzY4IiwidXNlcl9pZCI6OX0.CQCrLIK6fMd6kUEBYxEi-Ra5xnxR0O5KpeogwNTziTk"
+# }
+
+
+# djoser config
+DJOSER = {
+    'SERIALIZERS': {
+        'user_create': 'accounts.serializers.UserCreateSerializer',
+        'current_user': 'accounts.serializers.UserSerializer',
+    }
+}

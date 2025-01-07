@@ -3,13 +3,14 @@ from django.db.models import Count
 
 from .models import Product, Discount, Category, Comment, Customer, Address, Cart, CartItem, Order, OrderItem
 from .serializers import ProductSerializer, CategorySerializer, CommentSerializer, CartSerializer, CartItemSerializer, \
-    CartItemProductSerializer, CartItemAddSerializer, CartItemUpdateSerializer
+    CartItemProductSerializer, CartItemAddSerializer, CartItemUpdateSerializer, CustomerSerializer
 from .filters import ProductFilter
 from .paginations import DefaultPagination
+from .permissions import IsAdminOrReadOnly, SendPrivateEmailToCustomers
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -18,6 +19,7 @@ from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpda
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 
 
 class ProductViewSet(ModelViewSet):
@@ -49,6 +51,7 @@ class CategoryViewSet(ModelViewSet):
     search_fields = ['title']
     ordering_fields = ['id', 'number_of_products']
     # filterset_fields = ['title']
+    permission_classes = [IsAdminOrReadOnly]
     
     def get_queryset(self):
         return Category.objects.prefetch_related('products').annotate(\
@@ -98,6 +101,30 @@ class CartItemViewSet(ModelViewSet):
 
     def get_serializer_context(self):
         return {'cart_pk': self.kwargs.get('cart_pk')}
+
+
+class CustomerViewSet(ModelViewSet):
+    serializer_class = CustomerSerializer
+    queryset = Customer.objects.prefetch_related('orders').all()
+    permission_classes = [IsAdminUser]
+
+    @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+            user_id =request.user.id
+            customer = Customer.objects.get(user_id=user_id)
+
+            if request.method == 'GET':
+                serializer = CustomerSerializer(customer)
+                return Response(serializer.data)     
+            elif request.method == "PUT":
+                serializer = CustomerSerializer(customer, data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data)
+
+    @action(detail=True, permission_classes=[SendPrivateEmailToCustomers])
+    def sending_email(self, request, pk):
+        return Response(f"Sending email to customer {pk}")
 
 
 
