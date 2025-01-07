@@ -18,6 +18,7 @@ from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpda
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 
 class ProductViewSet(ModelViewSet):
@@ -103,10 +104,10 @@ class CartItemViewSet(ModelViewSet):
 class CustomerViewSet(ModelViewSet):
     serializer_class = CustomerSerializer
     queryset = Customer.objects.prefetch_related('orders').all()
+    permission_classes = [IsAdminUser]
 
-    @action(detail=False, methods=['GET', 'PUT'])
+    @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
     def me(self, request):
-        if request.user.is_authenticated:
             user_id =request.user.id
             customer = Customer.objects.get(user_id=user_id)
 
@@ -118,8 +119,6 @@ class CustomerViewSet(ModelViewSet):
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
                 return Response(serializer.data)
-        else:
-            return Response('Please login to show your data')
 
 
 
