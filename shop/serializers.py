@@ -236,7 +236,7 @@ class OrderCreateSerializer(serializers.Serializer):
     cart_id = serializers.UUIDField()
     
     def validate_cart_id(self, cart_id):
-        if not Cart.objects.filter(cart_id=cart_id).exists():
+        if not Cart.objects.filter(id=cart_id).exists():
             raise serializers.ValidationError('There is no cart with this id .')
         
         if CartItem.objects.filter(cart_id=cart_id).count() == 0:
@@ -247,5 +247,27 @@ class OrderCreateSerializer(serializers.Serializer):
     def save(self, **kwargs):
         cart_id = self.validated_data['cart_id']
         customer = Customer.objects.get(user_id=self.context['user_id'])
+        order = Order.objects.create(customer=customer)
+        cart_items = CartItem.objects.select_related('product').filter(cart_id=cart_id).all()
         
+        for cart_item in cart_items:
+            OrderItem.objects.create(
+            order=order,
+            product=cart_item.product,
+            quantity=cart_item.quantity,
+            unit_price=cart_item.product.unit_price
+            )
+        
+        return order
+    
+    
+        # cart = Cart.objects.prefetch_related('items').get(id=cart_id)
+        
+        # for item in cart.items.all():
+        #     OrderItem.objects.create(
+        #     order=order,
+        #     product=item.product,
+        #     quantity=item.quantity,
+        #     unit_price=item.product.unit_price
+        #     )
         
