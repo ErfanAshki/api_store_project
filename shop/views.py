@@ -4,10 +4,11 @@ from django.db.models import Count, Prefetch
 from .models import Product, Discount, Category, Comment, Customer, Address, Cart, CartItem, Order, OrderItem
 from .serializers import ProductSerializer, CategorySerializer, CommentSerializer, CartSerializer, CartItemSerializer, \
     CartItemProductSerializer, CartItemAddSerializer, CartItemUpdateSerializer, CustomerSerializer, OrderForAdminSerializer, \
-    OrderForUsersSerializer, OrderItemSerializer, ProductForOrderSerializer, OrderCreateSerializer
+    OrderForUsersSerializer, OrderItemSerializer, ProductForOrderSerializer, OrderCreateSerializer, OrderUpdateSerializer
 from .filters import ProductFilter
 from .paginations import DefaultPagination
 from .permissions import IsAdminOrReadOnly, SendPrivateEmailToCustomers
+from .signals import order_created
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -153,6 +154,9 @@ class OrderViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return OrderCreateSerializer
+
+        if self.request.method == 'PATCH':
+            return OrderUpdateSerializer
         
         user = self.request.user
         
@@ -170,10 +174,12 @@ class OrderViewSet(ModelViewSet):
                             context={'user_id' : self.request.user.id})    
        create_order_serializer.is_valid(raise_exception=True)
        created_order = create_order_serializer.save()
+       
+       order_created.send_robust(self.__class__, order=created_order)
 
        serializer = OrderForUsersSerializer(created_order)
        return Response(serializer.data)
-        
+
 
 
 # class ProductList(ListCreateAPIView):
