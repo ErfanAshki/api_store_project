@@ -133,7 +133,7 @@ class OrderViewSet(ModelViewSet):
     serializer_class = OrderSerializer
     
     def get_queryset(self):
-        return Order.objects.select_related('customer').prefetch_related(
+        return Order.objects.select_related('customer__user').prefetch_related(
             Prefetch('items', 
                     queryset=OrderItem.objects.select_related('product').all())
         ).all()

@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.utils import timezone
 from django.utils.text import slugify
 from decimal import Decimal
+from django.contrib.auth import get_user_model
 
 from .models import Product, Category, Comment, Order, OrderItem, Cart, CartItem, Customer
 
@@ -186,8 +187,25 @@ class OrderItemSerializer(serializers.ModelSerializer):
         fields = ['id', 'product', 'quantity', 'unit_price']
         
         product = ProductSerializer()
+
+
+
+# class UserForCustomerOrderSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = get_user_model()
+#         fields = ['first_name', 'last_name']
+
+
+class CustomerForOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = ['id', 'first_name', 'last_name', 'email']    
+        
+    # user = UserForCustomerOrderSerializer()
+    first_name = serializers.CharField(max_length=250, source='user.first_name')
+    last_name = serializers.CharField(max_length=250, source='user.last_name')
     
-    
+
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
@@ -196,6 +214,7 @@ class OrderSerializer(serializers.ModelSerializer):
         
     number_of_items = serializers.SerializerMethodField()
     items = OrderItemSerializer(many=True)
+    customer = CustomerForOrderSerializer()
 
     def get_number_of_items(self, order):
         return order.items.count()
