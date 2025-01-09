@@ -231,3 +231,16 @@ class OrderForUsersSerializer(serializers.ModelSerializer):
     def get_number_of_items(self, order):
         return order.items.count()
     
+
+class OrderCreateSerializer(serializers.Serializer):
+    cart_id = serializers.UUIDField()
+    
+    def validate_cart_id(self, cart_id):
+        if not Cart.objects.filter(cart_id=cart_id).exists():
+            raise serializers.ValidationError('There is no cart with this id .')
+        
+        if CartItem.objects.filter(cart_id=cart_id).count() == 0:
+            raise serializers.ValidationError('This cart is empty , please add some products to it first .')
+        
+        return cart_id
+    
