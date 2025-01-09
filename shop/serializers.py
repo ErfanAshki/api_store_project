@@ -244,3 +244,8 @@ class OrderCreateSerializer(serializers.Serializer):
         
         return cart_id
     
+    def save(self, **kwargs):
+        cart_id = self.validated_data['cart_id']
+        customer = Customer.objects.get(user_id=self.context['user_id'])
+        
+        

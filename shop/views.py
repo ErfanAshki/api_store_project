@@ -4,7 +4,7 @@ from django.db.models import Count, Prefetch
 from .models import Product, Discount, Category, Comment, Customer, Address, Cart, CartItem, Order, OrderItem
 from .serializers import ProductSerializer, CategorySerializer, CommentSerializer, CartSerializer, CartItemSerializer, \
     CartItemProductSerializer, CartItemAddSerializer, CartItemUpdateSerializer, CustomerSerializer, OrderForAdminSerializer, \
-    OrderForUsersSerializer, OrderItemSerializer, ProductForOrderSerializer
+    OrderForUsersSerializer, OrderItemSerializer, ProductForOrderSerializer, OrderCreateSerializer
 from .filters import ProductFilter
 from .paginations import DefaultPagination
 from .permissions import IsAdminOrReadOnly, SendPrivateEmailToCustomers
@@ -145,12 +145,17 @@ class OrderViewSet(ModelViewSet):
         return queryset.filter(customer__user_id=user.id)
              
     def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return OrderCreateSerializer
+        
         user = self.request.user
         
         if user.is_staff:
             return OrderForAdminSerializer
         return OrderForUsersSerializer
         
+    def get_serializer_context(self):
+        return {'user_id' : self.request.user.id}
         
 
 # class ProductList(ListCreateAPIView):
