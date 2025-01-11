@@ -280,3 +280,25 @@ class OrderCreateSerializer(serializers.Serializer):
         #     unit_price=item.product.unit_price
         #     )
         
+        
+class OrderUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['status', 'items']
+
+
+    items = OrderItemSerializer(many=True)
+
+    def update(self, instance, validated_data):
+        # به‌روزرسانی status
+        instance.status = validated_data.get('status', instance.status)
+        instance.save()
+
+        # به‌روزرسانی items
+        items_data = validated_data.get('items')
+        if items_data:
+            instance.items.all().delete()  # آیتم‌های قبلی رو پاک کن (اگه نیاز نیست، این رو حذف کن)
+            for item_data in items_data:
+                OrderItem.objects.create(order=instance, **item_data)
+
+        return instance
